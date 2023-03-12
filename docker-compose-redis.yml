@@ -1,0 +1,27 @@
+version: '3.4'
+services:
+  # redis
+  redis:
+    image: redis:7-alpine
+    command:
+    - sh
+    - -c # this is to evaluate the $REDIS_PASSWORD from the env
+    - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD ## $$ because of docker-compose
+    env_file: env/redis.env
+    volumes:
+    - netbox-redis-data:/data
+  redis-cache:
+    image: redis:7-alpine
+    command:
+    - sh
+    - -c # this is to evaluate the $REDIS_PASSWORD from the env
+    - redis-server --requirepass $$REDIS_PASSWORD ## $$ because of docker-compose
+    env_file: env/redis-cache.env
+    volumes:
+    - netbox-redis-cache-data:/data
+
+volumes:
+  netbox-redis-data:
+    driver: local
+  netbox-redis-cache-data:
+    driver: local

@@ -14,9 +14,6 @@ services:
     - ./reports:/etc/netbox/reports:z,ro
     - ./scripts:/etc/netbox/scripts:z,ro
     - netbox-media-files:/opt/netbox/netbox/media:z
-    extra_hosts:
-      - "redis:host-gateway"
-      - "redis-cache:host-gateway"
   netbox-worker:
     <<: *netbox
     depends_on:

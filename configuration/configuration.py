@@ -261,7 +261,6 @@ PLUGINS = [
 # # Each key in the dictionary is the name of an installed plugin and its value is a dictionary of settings.
 PLUGINS_CONFIG = {
     'nextbox_ui_plugin': {
-        'INITIAL_LAYOUT': 'vertical',
         'layers_sort_order': (
             'outside',
             'border',

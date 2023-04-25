@@ -277,6 +277,7 @@ PLUGINS_CONFIG = {
             'leaf',
             'access',
             'access-switch',
+            'tor-switch',
             'server',
             'host',
             'undefined',
@@ -294,6 +295,7 @@ PLUGINS_CONFIG = {
             'leaf': 'switch',
             'access': 'switch',
             'access-switch': 'switch',
+            'tor-switch': 'switch',
             'server': 'server',
             'host': 'server',
         }

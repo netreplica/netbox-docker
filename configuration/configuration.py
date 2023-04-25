@@ -259,8 +259,46 @@ PLUGINS = [
 
 # # Plugins configuration settings. These settings are used by various plugins that the user may have installed.
 # # Each key in the dictionary is the name of an installed plugin and its value is a dictionary of settings.
-# PLUGINS_CONFIG = {
-# }
+PLUGINS_CONFIG = {
+    'nextbox_ui_plugin': {
+        'layers_sort_order': (
+            'outside',
+            'border',
+            'edge',
+            'edge-switch',
+            'edge-router',
+            'core',
+            'core-router',
+            'core-switch',
+            'distribution',
+            'distribution-router',
+            'distribution-switch',
+            'spine',
+            'leaf',
+            'access',
+            'access-switch',
+            'server',
+            'host',
+            'undefined',
+        ),
+        'icon_role_map': {
+            'border': 'router',
+            'edge-switch': 'switch',
+            'edge-router': 'router',
+            'core-router': 'router',
+            'core-switch': 'switch',
+            'distribution': 'switch',
+            'distribution-router': 'router',
+            'distribution-switch': 'switch',
+            'spine': 'switch',
+            'leaf': 'switch',
+            'access': 'switch',
+            'access-switch': 'switch',
+            'server': 'server',
+            'host': 'server',
+        }
+    }
+}
 
 # When determining the primary IP address for a device, IPv6 is preferred over IPv4 by default. Set this to True to
 # prefer IPv4 instead.

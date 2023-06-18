@@ -14,7 +14,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       libsasl2-dev \
       libssl-dev \
       libxml2-dev \
-      libxml2-dev \
       libxmlsec1 \
       libxmlsec1-dev \
       libxmlsec1-openssl \
@@ -31,7 +30,15 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 ARG NETBOX_PATH
 COPY ${NETBOX_PATH}/requirements.txt requirements-container.txt /
-RUN sed -i -e '/psycopg2-binary/d' requirements.txt && \
+RUN \
+    # We compile 'psycopg2' in the build process
+    sed -i -e '/psycopg2-binary/d' /requirements.txt && \
+    # Gunicorn is not needed because we use Nginx Unit
+    sed -i -e '/gunicorn/d' /requirements.txt && \
+    # We need 'social-auth-core[all]' in the Docker image. But if we put it in our own requirements-container.txt
+    # we have potential version conflicts and the build will fail.
+    # That's why we just replace it in the original requirements.txt.
+    sed -i -e 's/social-auth-core\[openidconnect\]/social-auth-core\[all\]/g' /requirements.txt && \
     /opt/netbox/venv/bin/pip install \
       -r /requirements.txt \
       -r /requirements-container.txt
@@ -66,14 +73,16 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update -qq \
     && apt-get install \
       --yes -qq --no-install-recommends \
-      unit=1.27.0-1~jammy \
-      unit-python3.10=1.27.0-1~jammy \
+      unit=1.29.1-1~jammy \
+      unit-python3.10=1.29.1-1~jammy \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /opt/netbox/venv /opt/netbox/venv
 
 ARG NETBOX_PATH
 COPY ${NETBOX_PATH} /opt/netbox
+# Copy the modified 'requirements*.txt' files, to have the files actually used during installation
+COPY --from=builder /requirements.txt /requirements-container.txt /opt/netbox/
 
 COPY docker/configuration.docker.py /opt/netbox/netbox/netbox/configuration.py
 COPY docker/ldap_config.docker.py /opt/netbox/netbox/netbox/ldap_config.py
@@ -88,13 +97,13 @@ WORKDIR /opt/netbox/netbox
 # Must set permissions for '/opt/netbox/netbox/media' directory
 # to g+w so that pictures can be uploaded to netbox.
 RUN mkdir -p static /opt/unit/state/ /opt/unit/tmp/ \
-      && chown -R unit:root media /opt/unit/ \
-      && chmod -R g+w media /opt/unit/ \
-      && cd /opt/netbox/ && SECRET_KEY="dummy" /opt/netbox/venv/bin/python -m mkdocs build \
+      && chown -R unit:root /opt/unit/ media reports scripts \
+      && chmod -R g+w /opt/unit/ media reports scripts \
+      && cd /opt/netbox/ && SECRET_KEY="dummyKeyWithMinimumLength-------------------------" /opt/netbox/venv/bin/python -m mkdocs build \
           --config-file /opt/netbox/mkdocs.yml --site-dir /opt/netbox/netbox/project-static/docs/ \
-      && SECRET_KEY="dummy" /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py collectstatic --no-input
+      && SECRET_KEY="dummyKeyWithMinimumLength-------------------------" /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py collectstatic --no-input
 
-ENV LANG=C.UTF-8 PATH=/opt/netbox/venv/bin:$PATH
+ENV LANG=C.utf8 PATH=/opt/netbox/venv/bin:$PATH
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
 
 CMD [ "/opt/netbox/docker-entrypoint.sh", "/opt/netbox/launch-netbox.sh" ]

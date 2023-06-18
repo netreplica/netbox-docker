@@ -16,11 +16,13 @@ while getopts ${optstring} arg; do
       # bring up netbox docker instance
       docker-compose -f ./docker-compose-redis.yml up -d
       docker-compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" up -d
+      exit
       ;;
     r)
       # shut down netbox docker instance
       docker-compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" down
       docker-compose -f ./docker-compose-redis.yml down
+      exit
       ;;
     h)
       usage
@@ -33,4 +35,5 @@ while getopts ${optstring} arg; do
   esac
 done
 
-
+usage
+exit 2

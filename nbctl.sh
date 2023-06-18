@@ -12,13 +12,13 @@ optstring="u:d:h"
 
 while getopts ${optstring} arg; do
   case ${arg} in
-    s)
+    u)
       # bring up netbox docker instance
       docker-compose -f ./docker-compose-redis.yml up -d
       docker-compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" up -d
       exit
       ;;
-    r)
+    d)
       # shut down netbox docker instance
       docker-compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" down
       docker-compose -f ./docker-compose-redis.yml down

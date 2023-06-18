@@ -14,7 +14,7 @@ while getopts ${optstring} arg; do
   case ${arg} in
     u)
       # bring up netbox docker instance
-      if "${OPTARG}" = "redis"
+      if ["${OPTARG}" = "redis"]
       then
         docker-compose -f ./docker-compose-redis.yml up -d
       else
@@ -24,7 +24,7 @@ while getopts ${optstring} arg; do
       ;;
     d)
       # shut down netbox docker instance
-      if "${OPTARG}" = "redis"
+      if ["${OPTARG}" = "redis"]
       then
         docker-compose -f ./docker-compose-redis.yml down
       else

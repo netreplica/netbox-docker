@@ -4,11 +4,12 @@ function usage {
   echo "Usage: $(basename $0) [-u|d] <instance> [-h]" 2>&1
   echo '   -u <instance>  bring up netbox docker instance' 2>&1
   echo '   -d <instance>  shut down netbox docker instance' 2>&1
+  echo '   -q <instance>  status of the worker queue for netbox docker instance' 2>&1
   echo '   -h         show usage' 2>&1
 }
 
 # list of arguments expected in the input
-optstring="u:d:h"
+optstring="u:d:q:h"
 
 while getopts ${optstring} arg; do
   case ${arg} in
@@ -29,6 +30,17 @@ while getopts ${optstring} arg; do
         docker-compose -f ./docker-compose-redis.yml down
       else
         docker-compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" down
+      fi
+      exit
+      ;;
+    q)
+      # status of the worker queue for netbox docker instance
+      if [ "${OPTARG}" = "redis" ]
+      then
+        echo "Redis does not have a worker queue"
+      else
+        docker-compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" \
+        run --rm netbox-worker /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py rqstats
       fi
       exit
       ;;

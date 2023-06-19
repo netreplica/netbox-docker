@@ -61,15 +61,31 @@ REDIS_DATABASE=3510
 REDIS_CACHE_DATABASE=3511
 ```
 
-6. Update image version in `docker-compose-app.yml` as well as in `docker-compose-redis.yml` to match images from `docker-compose.yml`.
+6. Update `docker-compose.override.yml` files for each instance to use different TCP ports than the `current` instances:
 
-7. Pull the `latest` images
+```
+services:
+  netbox:
+    ports:
+      - 8135:8080
+```
+
+7. Update image version in `docker-compose.override.yml` to match images from `docker-compose.yml`.
+
+```
+version: '3.4'
+services:
+  netbox:
+    image: docker.io/netboxcommunity/netbox:${VERSION-v3.5-2.6.1}
+```
+
+8. Pull the `latest` images
 
 ```Shell
 docker-compose pull
 ```
 
-7. Start `latest` instances
+9. Start `latest` instances
 
 ```Shell
 ./nbctl.sh -u redis

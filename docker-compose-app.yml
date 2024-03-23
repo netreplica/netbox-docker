@@ -2,7 +2,6 @@ version: '3.4'
 services:
   netbox: &netbox
     restart: always
-    image: netbox-ui:${VERSION-v3.4-2.4.0}
     env_file: env/netbox.env
     user: 'unit:root'
     healthcheck:

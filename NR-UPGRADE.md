@@ -104,7 +104,7 @@ networks:
 
 ```Shell
 cd "${REPO_DIR}"
-docker-compose pull
+docker compose pull
 ```
 
 9. Start `latest` instances

@@ -17,9 +17,9 @@ while getopts ${optstring} arg; do
       # bring up netbox docker instance
       if [ "${OPTARG}" = "redis" ]
       then
-        docker-compose -f ./docker-compose-redis.yml up -d
+        docker compose -f ./docker-compose-redis.yml up -d
       else
-        docker-compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" up -d
+        docker compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" up -d
       fi
       exit
       ;;
@@ -27,9 +27,9 @@ while getopts ${optstring} arg; do
       # shut down netbox docker instance
       if [ "${OPTARG}" = "redis" ]
       then
-        docker-compose -f ./docker-compose-redis.yml down
+        docker compose -f ./docker-compose-redis.yml down
       else
-        docker-compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" down
+        docker compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" down
       fi
       exit
       ;;
@@ -39,7 +39,7 @@ while getopts ${optstring} arg; do
       then
         echo "Redis does not have a worker queue"
       else
-        docker-compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" \
+        docker compose -p "${OPTARG}" -f ./docker-compose-app.yml -f "/mnt/netbox/${OPTARG}/docker-compose.override.yml" \
         run --rm netbox-worker /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py rqstats
       fi
       exit

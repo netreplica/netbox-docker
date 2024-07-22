@@ -27,9 +27,9 @@ sudo apt install postgresql-client
 
 ```Shell
 INSTANCE=main
-PREVIOUS=v33
-CURRENT=v34
-LATEST=v35
+PREVIOUS=v34
+CURRENT=v35
+LATEST=v36
 REPO_DIR="$(pwd)"
 
 ./nbctl.sh -d "${INSTANCE}_${PREVIOUS}"
@@ -37,10 +37,10 @@ REPO_DIR="$(pwd)"
 ./nbctl.sh -d "${INSTANCE}_${LATEST}"
 ```
 
-2. Backup `current` DB:
+2. Backup `latest` DBs:
 
 ```Shell
-cd /mnt/netbox/"${INSTANCE}_${CURRENT}"
+cd /mnt/netbox/"${INSTANCE}_${LATEST}"
 bash -c "eval \"$(cat netbox.env | grep DB_)\"; pg_dump --exclude-table-data=extras_objectchange \"host=\${DB_HOST} dbname=\${DB_NAME} user=\${DB_USER} password=\${DB_PASSWORD}\"" > backup.sql
 cd /mnt/netbox
 ```
@@ -48,9 +48,9 @@ cd /mnt/netbox
 3. Move the versions:
 
 ```Shell
-PREVIOUS=v34
-CURRENT=v35
-LATEST=v36
+PREVIOUS=v35
+CURRENT=v36
+LATEST=v37
 cp -r "${INSTANCE}_${CURRENT}" "${INSTANCE}_${LATEST}"
 ```
 
@@ -74,22 +74,22 @@ REDIS_CACHE_DATABASE=5
 6. Update image version in `docker-compose.override.yml` to match images from `docker-compose.yml`, use correct path to the `env_file` and different TCP ports than the `current` instance:
 
 ```
-version: '3.6'
+version: '3.7'
 services:
   netbox:
-    image: docker.io/netboxcommunity/netbox:${VERSION-v3.6-2.7.0}
+    image: docker.io/netboxcommunity/netbox:${VERSION-v3.7-2.8.0}
     ports:
-      - 8136:8080
+      - 8137:8080
     env_file: /mnt/netbox/main_v36/netbox.env
     networks:
       - redis-net
   netbox-worker:
-    image: docker.io/netboxcommunity/netbox:${VERSION-v3.6-2.7.0}
+    image: docker.io/netboxcommunity/netbox:${VERSION-v3.7-2.8.0}
     env_file: /mnt/netbox/main_v36/netbox.env
     networks:
       - redis-net
   netbox-housekeeping:
-    image: docker.io/netboxcommunity/netbox:${VERSION-v3.6-2.7.0}
+    image: docker.io/netboxcommunity/netbox:${VERSION-v3.7-2.8.0}
     env_file: /mnt/netbox/main_v36/netbox.env
     networks:
       - redis-net
@@ -104,7 +104,7 @@ networks:
 
 ```Shell
 cd "${REPO_DIR}"
-docker compose pull
+docker compose -f docker-compose-app.yml -f /mnt/netbox/INSTANCE1/docker-compose.override.yml pull
 ```
 
 9. Start `latest` instances

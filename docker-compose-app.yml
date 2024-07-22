@@ -11,9 +11,9 @@ services:
       test: "curl -f http://localhost:8080/api/ || exit 1"
     volumes:
     - ./configuration:/etc/netbox/config:z,ro
-    - ./reports:/etc/netbox/reports:z,ro
-    - ./scripts:/etc/netbox/scripts:z,ro
-    - netbox-media-files:/opt/netbox/netbox/media:z
+    - netbox-media-files:/opt/netbox/netbox/media:rw
+    - netbox-reports-files:/opt/netbox/netbox/reports:rw
+    - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
   netbox-worker:
     <<: *netbox
     depends_on:
@@ -43,4 +43,8 @@ services:
 
 volumes:
   netbox-media-files:
+    driver: local
+  netbox-reports-files:
+    driver: local
+  netbox-scripts-files:
     driver: local

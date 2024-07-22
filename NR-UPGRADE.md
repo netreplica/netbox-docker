@@ -23,13 +23,13 @@ sudo apt install postgresql-client
 
 ## Step-by-step
 
-1. Shutdown all `current` instances. Here and below, we assume the instance name is `INSTANCE1` and the `latest` version is `3.5`
+1. Shutdown all `latest` instances. Here and below, we assume the instance name is `INSTANCE1` and the `latest` version is `3.5`
 
 ```Shell
 ./nbctl.sh -d INSTANCE1
 ```
 
-2. Backup `current` DBs:
+2. Backup `latest` DBs:
 
 ```Shell
 cd /mnt/netbox/INSTANCE1
@@ -37,31 +37,31 @@ bash -c "eval \"$(cat netbox.env | grep DB_)\"; pg_dump --exclude-table-data=ext
 cd /mnt/netbox
 ```
 
-3. Make a clone of the `current` DBs. You will need a password for `postgres` superuser.
+3. Make a clone of the `latest` DBs. You will need a password for `postgres` superuser.
 
-> WARNING. This appends `_v35` at the end of the `current` db name without stripping any existing versions. Requires improvement.
+> WARNING. This appends `_v37` at the end of the `current` db name without stripping any existing versions. Requires improvement.
 
 ```Shell
 cd /mnt/netbox/INSTANCE1
-bash -c "eval \"$(cat netbox.env | grep DB_)\"; psql -h \${DB_HOST} -U postgres -W -c \"CREATE DATABASE \${DB_NAME}_v35 WITH TEMPLATE \${DB_NAME} OWNER \${DB_USER};\""
+bash -c "eval \"$(cat netbox.env | grep DB_)\"; psql -h \${DB_HOST} -U postgres -W -c \"CREATE DATABASE \${DB_NAME}_v37 WITH TEMPLATE \${DB_NAME} OWNER \${DB_USER};\""
 cd /mnt/netbox
 ```
 
-4. Make copies of `current` environment directories & files
+4. Make copies of `latest` environment directories & files
 
 ```Shell
-cp -r INSTANCE1 INSTANCE1_v35
+cp -r INSTANCE1 INSTANCE1_v37
 ```
 
 5. Update `netbox.env` files for each instance to use newly created DB name as well as unique REDIS DB IDs. Use `latest` version as a prefix for REDIS:
 
 ```
-DB_NAME=INSTANCE1_v35
-REDIS_DATABASE=3510
-REDIS_CACHE_DATABASE=3511
+DB_NAME=INSTANCE1_v37
+REDIS_DATABASE=6
+REDIS_CACHE_DATABASE=7
 ```
 
-6. Update `docker-compose.override.yml` files for each instance to use different TCP ports than the `current` instances:
+6. Update `docker-compose.override.yml` files for each instance to use different TCP ports than the `latest` instances:
 
 ```
 services:
@@ -76,18 +76,18 @@ services:
 version: '3.4'
 services:
   netbox:
-    image: docker.io/netboxcommunity/netbox:${VERSION-v3.5-2.6.1}
+    image: docker.io/netboxcommunity/netbox:${VERSION-v3.7-2.8.0}
 ```
 
 8. Pull the `latest` images
 
 ```Shell
-docker-compose pull
+docker compose -f docker-compose-app.yml -f /mnt/netbox/INSTANCE1/docker-compose.override.yml pull
 ```
 
 9. Start `latest` instances
 
 ```Shell
 ./nbctl.sh -u redis
-./nbctl.sh -u INSTANCE1_v35
+./nbctl.sh -u INSTANCE1_v36
 ```

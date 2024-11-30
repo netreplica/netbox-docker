@@ -110,11 +110,16 @@ cd "${REPO_DIR}"
 docker compose -f docker-compose-app.yml -f "/mnt/netbox/${INSTANCE}_${LATEST}/docker-compose.override.yml" pull
 ```
 
-9. Start `latest` instances
+9. Start `latest` instance
 
 ```Shell
 ./nbctl.sh -u redis
-./nbctl.sh -u "${INSTANCE}_${PREVIOUS}"
-./nbctl.sh -u "${INSTANCE}_${CURRENT}"
 ./nbctl.sh -u "${INSTANCE}_${LATEST}"
+```
+
+10. After CPU load goes into normal, start other instances
+
+```Shell
+./nbctl.sh -u "${INSTANCE}_${CURRENT}"
+./nbctl.sh -u "${INSTANCE}_${PREVIOUS}"
 ```

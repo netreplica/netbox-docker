@@ -1,5 +1,5 @@
 ARG FROM
-FROM ${FROM} as builder
+FROM ${FROM} AS builder
 
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update -qq \
@@ -31,14 +31,12 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 ARG NETBOX_PATH
 COPY ${NETBOX_PATH}/requirements.txt requirements-container.txt /
 RUN \
-    # We compile 'psycopg' in the build process
-    sed -i -e '/psycopg/d' /requirements.txt && \
     # Gunicorn is not needed because we use Nginx Unit
     sed -i -e '/gunicorn/d' /requirements.txt && \
     # We need 'social-auth-core[all]' in the Docker image. But if we put it in our own requirements-container.txt
     # we have potential version conflicts and the build will fail.
     # That's why we just replace it in the original requirements.txt.
-    sed -i -e 's/social-auth-core\[openidconnect\]/social-auth-core\[all\]/g' /requirements.txt && \
+    sed -i -e 's/social-auth-core/social-auth-core\[all\]/g' /requirements.txt && \
     /opt/netbox/venv/bin/pip install \
       -r /requirements.txt \
       -r /requirements-container.txt
@@ -48,7 +46,7 @@ RUN \
 ###
 
 ARG FROM
-FROM ${FROM} as main
+FROM ${FROM} AS main
 
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update -qq \
@@ -65,17 +63,16 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       openssh-client \
       openssl \
       python3 \
-      python3-distutils \
       tini \
     && curl --silent --output /usr/share/keyrings/nginx-keyring.gpg \
       https://unit.nginx.org/keys/nginx-keyring.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/ubuntu/ lunar unit" \
+    && echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/ubuntu/ noble unit" \
       > /etc/apt/sources.list.d/unit.list \
     && apt-get update -qq \
     && apt-get install \
       --yes -qq --no-install-recommends \
-      unit=1.31.1-1~lunar \
-      unit-python3.11=1.31.1-1~lunar \
+      unit=1.33.0-1~noble \
+      unit-python3.12=1.33.0-1~noble \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /opt/netbox/venv /opt/netbox/venv

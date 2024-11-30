@@ -27,9 +27,9 @@ sudo apt install postgresql-client
 
 ```Shell
 INSTANCE=main
-PREVIOUS=v35
-CURRENT=v36
-LATEST=v37
+PREVIOUS=v36
+CURRENT=v37
+LATEST=v40
 REPO_DIR="$(pwd)"
 
 ./nbctl.sh -d "${INSTANCE}_${PREVIOUS}"
@@ -47,9 +47,9 @@ cd /mnt/netbox
 3. Move the versions:
 
 ```Shell
-PREVIOUS=v36
-CURRENT=v37
-LATEST=v40
+PREVIOUS=v37
+CURRENT=v40
+LATEST=v41
 cp -r "${INSTANCE}_${CURRENT}" "${INSTANCE}_${LATEST}"
 ```
 
@@ -63,11 +63,16 @@ mv netbox.env.new netbox.env
 bash -c "eval \"$(cat netbox.env | grep DB_)\"; psql -h \${DB_HOST} -U postgres -W -c \"CREATE DATABASE \${DB_NAME} WITH TEMPLATE \${DB_NAME_CURRENT} OWNER \${DB_USER};\""
 ```
 
-5. Update `netbox.env` files for each instance to use newly created DB name as well as unique REDIS DB IDs.
+5. Update `netbox.env` files for each instance to use newly created DB name as well as unique REDIS DB IDs. Max redis id is 7.
 
 ```
-REDIS_DATABASE=0
-REDIS_CACHE_DATABASE=1
+cat ../"${INSTANCE}_${PREVIOUS}"/netbox.env | grep REDIS | grep DATABASE
+cat ../"${INSTANCE}_${CURRENT}"/netbox.env | grep REDIS | grep DATABASE
+vi netbox.env
++++
+REDIS_DATABASE=2
+REDIS_CACHE_DATABASE=3
+---
 ```
 
 6. Update image version in `docker-compose.override.yml` to match images from `docker-compose.yml`, use correct path to the `env_file` and different TCP ports than the `current` instance:
@@ -75,20 +80,20 @@ REDIS_CACHE_DATABASE=1
 ```
 services:
   netbox:
-    image: docker.io/netboxcommunity/netbox:${VERSION-v4.0-2.9.1}
+    image: docker.io/netboxcommunity/netbox:${VERSION-v4.1-3.0.2}
     ports:
-      - 8140:8080
-    env_file: /mnt/netbox/main_v40/netbox.env
+      - 8141:8080
+    env_file: /mnt/netbox/main_v41/netbox.env
     networks:
       - redis-net
   netbox-worker:
-    image: docker.io/netboxcommunity/netbox:${VERSION-v4.0-2.9.1}
-    env_file: /mnt/netbox/main_v40/netbox.env
+    image: docker.io/netboxcommunity/netbox:${VERSION-v4.1-3.0.2}
+    env_file: /mnt/netbox/main_v41/netbox.env
     networks:
       - redis-net
   netbox-housekeeping:
-    image: docker.io/netboxcommunity/netbox:${VERSION-v4.0-2.9.1}
-    env_file: /mnt/netbox/main_v40/netbox.env
+    image: docker.io/netboxcommunity/netbox:${VERSION-v4.1-3.0.2}
+    env_file: /mnt/netbox/main_v41/netbox.env
     networks:
       - redis-net
 

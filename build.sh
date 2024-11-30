@@ -61,7 +61,7 @@ DOCKERFILE  The name of Dockerfile to use.
             ${_GREEN}Default:${_CLEAR} Dockerfile
 
 DOCKER_FROM The base image to use.
-            ${_GREEN}Default:${_CLEAR} 'ubuntu:23.04'
+            ${_GREEN}Default:${_CLEAR} 'ubuntu:24.04'
 
 BUILDX_PLATFORMS
             Specifies the platform(s) to build the image for.
@@ -102,6 +102,8 @@ GH_ACTION   If defined, special 'echo' statements are enabled that set the
             following environment variables in Github Actions:
             - FINAL_DOCKER_TAG: The final value of the DOCKER_TAG env variable
             ${_GREEN}Default:${_CLEAR} undefined
+
+CHECK_ONLY  Only checks if the build is needed and sets the GH Action output.
 
 ${_BOLD}Examples:${_CLEAR}
 
@@ -219,7 +221,7 @@ fi
 # Determining the value for DOCKER_FROM
 ###
 if [ -z "$DOCKER_FROM" ]; then
-  DOCKER_FROM="docker.io/ubuntu:23.04"
+  DOCKER_FROM="docker.io/ubuntu:24.04"
 fi
 
 ###
@@ -354,6 +356,11 @@ else
   gh_out "skipped=false"
 fi
 gh_echo "::endgroup::"
+
+if [ "${CHECK_ONLY}" = "true" ]; then
+  echo "Only check if build needed was requested. Exiting"
+  exit 0
+fi
 
 ###
 # Build the image
